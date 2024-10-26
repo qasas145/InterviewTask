@@ -4,15 +4,13 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from pymongo import MongoClient
 import uuid
 
-# اتصال بقاعدة البيانات MongoDB
-client = MongoClient("mongodb://localhost:27017/")
-db = client["your_database"]
+client = MongoClient("mongodb://mongodb:27017/")
+db = client["TaskDatabase"]
 users_collection = db["users"]
 organizations_collection = db["organizations"]
 
 api = Blueprint("api", __name__)
 
-# Endpoint: Signup
 @api.route("/signup", methods=["POST"])
 def signup():
     data = request.get_json()
@@ -26,7 +24,7 @@ def signup():
     users_collection.insert_one(user)
     return jsonify({"message": "User created successfully"}), 201
 
-# Endpoint: Signin
+
 @api.route("/signin", methods=["POST"])
 def signin():
     data = request.get_json()
@@ -42,7 +40,6 @@ def signin():
         })
     return jsonify({"message": "Invalid email or password"}), 401
 
-# Endpoint: Refresh Token
 @api.route("/refresh-token", methods=["POST"])
 @jwt_required(refresh=True)
 def refresh_token():
@@ -53,7 +50,6 @@ def refresh_token():
         "access_token": new_access_token
     })
 
-# Endpoint: Create Organization
 @api.route("/organization", methods=["POST"])
 @jwt_required()
 def create_organization():
@@ -67,7 +63,6 @@ def create_organization():
     organizations_collection.insert_one(organization)
     return jsonify({"organization_id": organization["organization_id"]}), 201
 
-# Endpoint: Get Organization
 @api.route("/organization/<organization_id>", methods=["GET"])
 @jwt_required()
 def get_organization(organization_id):
@@ -82,7 +77,6 @@ def get_organization(organization_id):
         "organization_members": organization["members"]
     })
 
-# Endpoint: Get All Organizations
 @api.route("/organization", methods=["GET"])
 @jwt_required()
 def get_all_organizations():
@@ -97,7 +91,6 @@ def get_all_organizations():
         })
     return jsonify(output)
 
-# Endpoint: Update Organization
 @api.route("/organization/<organization_id>", methods=["PUT"])
 @jwt_required()
 def update_organization(organization_id):
@@ -114,7 +107,6 @@ def update_organization(organization_id):
         "description": data["description"]
     })
 
-# Endpoint: Delete Organization
 @api.route("/organization/<organization_id>", methods=["DELETE"])
 @jwt_required()
 def delete_organization(organization_id):
@@ -123,7 +115,6 @@ def delete_organization(organization_id):
         return jsonify({"message": "Organization not found"}), 404
     return jsonify({"message": "Organization deleted successfully"})
 
-# Endpoint: Invite User to Organization
 @api.route("/organization/<organization_id>/invite", methods=["POST"])
 @jwt_required()
 def invite_user(organization_id):
@@ -132,7 +123,6 @@ def invite_user(organization_id):
     if not organization:
         return jsonify({"message": "Organization not found"}), 404
     
-    # إضافة المستخدم كعضو جديد
     new_member = {
         "name": data["user_email"],
         "email": data["user_email"],
