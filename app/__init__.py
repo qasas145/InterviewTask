@@ -15,8 +15,6 @@ def create_app():
     client = MongoClient(app.config["MONGO_URI"])
     app.db = client.get_database()
 
-    # Redis setup
-    app.redis = redis.Redis(host="redis", port=6379, decode_responses=True)
 
     # Register routes
     from .routes import api
