@@ -8,7 +8,6 @@ services:
       - FLASK_ENV=development
     depends_on:
       - mongodb
-      - redis
 
   mongodb:
     image: mongo
